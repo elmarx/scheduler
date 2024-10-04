@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -23,3 +24,48 @@ spec:
             - containerPort: 8080
               protocol: TCP
       restartPolicy: Always
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: leader
+  labels:
+    app: scheduler
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - watch
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - watch
+      - get
+      - update
+    resourceNames:
+      - leader
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app: scheduler
+  name: leader
+roleRef:
+  apiGroup: ""
+  kind: Role
+  name: leader
+subjects:
+  - kind: ServiceAccount
+    name: default
+    apiGroup: ""
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: leader
