@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scheduler
+  labels:
+    app: scheduler
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: scheduler
+  template:
+    metadata:
+      name: scheduler
+      labels:
+        app: scheduler
+    spec:
+      containers:
+        - name: scheduler
+          image: ghcr.io/elmarx/scheduler:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+      restartPolicy: Always
